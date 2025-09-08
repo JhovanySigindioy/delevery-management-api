@@ -1,0 +1,21 @@
+# Archivos de entorno local
+.env
+.env.local
+
+# Módulos y dependencias
+node_modules/
+
+# Directorios de compilación
+dist/
+build/
+
+# Archivos de registro
+*.log
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Configuración de IDEs
+.vscode/
+.idea/
