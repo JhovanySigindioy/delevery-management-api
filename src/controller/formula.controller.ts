@@ -1,18 +1,18 @@
 // src/controllers/contractData.controller.ts
 import { Request, Response } from "express";
 import { logger } from "../utils/logger";
-import { getFormulaDataService } from "../services/getDataFormula.service";
-import { IUnifiedResponse } from "../services/getDataFormula.service";
+import { getFormulaDataService } from "../services/formulaData.service";
+import { IUnifiedResponse } from "../services/formulaData.service";
 
 export async function getFormulaDataController(req: Request, res: Response): Promise<Response> {
     try {
-        const { valor, bodega } = req.query;
+        const { registeredTypeNumber, dispensaryCode } = req.query;
 
         // El servicio ahora devuelve un objeto con un formato unificado
-        const result: IUnifiedResponse = await getFormulaDataService(valor as string, bodega as string);
+        const result: IUnifiedResponse = await getFormulaDataService(registeredTypeNumber as string, dispensaryCode as string);
 
         if (result.error) {
-            logger.warn(`Consulta sin resultados: radicado/tiponumero=${valor}, bodega=${bodega}. Error: ${result.error}`);
+            logger.warn(`Consulta sin resultados: radicado/tiponumero=${registeredTypeNumber}, dispensaryCode=${dispensaryCode}. Error: ${result.error}`);
             return res.status(404).json({
                 success: false,
                 data: null,
@@ -21,11 +21,11 @@ export async function getFormulaDataController(req: Request, res: Response): Pro
         }
 
         // Respuesta exitosa
-        logger.info(`Consulta exitosa: radicado/tiponumero=${valor}, bodega=${bodega}`);
+        logger.info(`Consulta exitosa: radicado/tiponumero=${registeredTypeNumber}, dispensaryCode=${dispensaryCode}`);
         return res.status(200).json({
             success: true,
             data: {
-                resgisteredTypeNumber: valor,
+                registeredTypeNumber: registeredTypeNumber,
                 identification: result.identificacion,
                 name: result.nombre,
                 phones: result.telefonos,

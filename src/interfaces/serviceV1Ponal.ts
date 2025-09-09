@@ -1,7 +1,7 @@
 
 // src/interfaces/serviceV1Ponal.ts
 
-//  Tipo de datos esperados en "data"
+//  Tipo de datos esperados en en la respuesta del api ponal "data"
 export interface FormulaData {
   formula: string;
   evento: string;

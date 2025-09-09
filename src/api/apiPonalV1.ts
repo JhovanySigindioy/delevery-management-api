@@ -6,12 +6,12 @@ import { ServiceV1PonalRequest, FormulaData } from "../interfaces/serviceV1Ponal
 import { ApiResponse } from "../interfaces/apiResponse";
 import { parserToJson } from "../utils/parserToJson";
 
-export async function getDataRadicado(radicado: string, bodega: string): Promise<ApiResponse<FormulaData[]>> {
+export async function getDataRegistered(resgistered: string, dispensaryCode: string): Promise<ApiResponse<FormulaData[]>> {
     try {
         const payload: ServiceV1PonalRequest = {
             Datos: {
-                numRadicado: radicado,
-                dispensario: bodega,
+                numRadicado: resgistered,
+                dispensario: dispensaryCode,
             },
             Servicio: env.apiPonal.servicio,
         };
@@ -29,7 +29,7 @@ export async function getDataRadicado(radicado: string, bodega: string): Promise
         return parsedResponse;
 
     } catch (error: any) {
-        logger.error("Error en getDataRadicado:", error);
+        logger.error("Error en getDataResgistered:", error);
 
         return {
             success: false,

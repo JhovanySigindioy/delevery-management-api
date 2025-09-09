@@ -1,7 +1,7 @@
 // src/controllers/contractData.controller.ts
 import { Request, Response } from "express";
 import { logger } from "../utils/logger";
-import { getContractDataService } from "../services/getContractData.service";
+import { getContractDataService } from "../services/contractData.service";
 
 export async function getContractDataController(req: Request, res: Response) {
     try {

@@ -1,24 +1,26 @@
 // src/interfaces/managementEntrega.ts
 export interface ManagementEntrega {
-    radicadoTipoNumero: string;      // GestionesEntregasPendientes.radicado_tipo_numero
-    nombrePaciente: string;          // DatosPacientesDomicilios.nombre_paciente
-    identificacion: string;          // DatosPacientesDomicilios.identificacion
-    contacto1: string;               // DatosPacientesDomicilios.contacto1
-    contacto2?: string | null;       // DatosPacientesDomicilios.contacto2
-    correo?: string | null;          // DatosPacientesDomicilios.correo
-    direccion: string;               // DatosPacientesDomicilios.direccion
+    registeredTypeNumber: string;
+    patientName: string;
+    identification: string;
+    primaryPhone: string;
+    secondaryPhone?: string | null;
+    email?: string | null;
+    address: string;
 
-    fechaGestion: string;            // ISO string (DATE en SQL)
-    horaGestion: string;             // HH:mm:ss (TIME en SQL)
+    managementDate: string;
+    managementTime: string;
 
-    fechaDomicilio?: string | null;  // DATE opcional (puede no seleccionarse)
-    horaDomicilio?: string | null;   // TIME opcional (puede no seleccionarse)
+    deliveryDate?: string | null;
+    deliveryTime?: string | null;
 
-    tipoEmpaque: string;          // GestionesEntregasPendientes.tipo_empaque
-    resultadoLlamada: string;        // GestionesEntregasPendientes.resultado_llamada
-    observaciones?: string | null;   // GestionesEntregasPendientes.observaciones
-    regenteId: string;               // GestionesEntregasPendientes.regente_id (NOT NULL en SQL)
-    esUrgente?: boolean;             // Indica si la entrega es urgente
-    enviado_a_domicilio: boolean;    // Indica si la entrega ha sido enviada a domicilio
+    packageType: string;
+    callResult: string;
+    notes?: string | null;
+    pharmacistId: string;
+    isUrgent?: boolean;
+    sentToHome: boolean;
 }
-            
+
+
+

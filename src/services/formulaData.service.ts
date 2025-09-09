@@ -1,8 +1,8 @@
 import { connectToDatabase } from "../config";
-import { logger, formatTipoNumero } from "../utils";
+import { logger, formatTypeNumber } from "../utils";
 import { FormulaData } from "../interfaces/serviceV1Ponal";
 import { ApiResponse } from "../interfaces/apiResponse";
-import { getDataRadicado } from "../api/apiPonalV1";
+import { getDataRegistered } from "../api/apiPonalV1";
 
 // Interfaz para el formato de respuesta unificado
 export interface IUnifiedResponse {
@@ -15,10 +15,12 @@ export interface IUnifiedResponse {
   error: string | null;
 }
 
-export async function getFormulaDataService(valor: string, bodega: string): Promise<IUnifiedResponse> {
-  let pool;
+export async function getFormulaDataService(
+  resgisteredTypeNumber: string,
+  dispensaryCode: string
+): Promise<IUnifiedResponse> {
   try {
-    pool = await connectToDatabase();
+    const pool = await connectToDatabase();
 
     let identificacion: string | null = null;
     let numeroFormula: string | null = null;
@@ -27,11 +29,10 @@ export async function getFormulaDataService(valor: string, bodega: string): Prom
     let correo: string | null = null;
     let direccion: string | null = null;
 
-    // Caso 1: es un radicado
-    if (/^\d+$/.test(valor)) {
-      // 1. Validar el radicado en la BD local
+    // 🟢 Caso 1: es un radicado (solo números)
+    if (/^\d+$/.test(resgisteredTypeNumber)) {
       const result = await pool.request()
-        .input("radicado", valor)
+        .input("radicado", resgisteredTypeNumber)
         .query<{ NumeroFormula: string }>(`
           SELECT NumeroFormula
           FROM POS_Encabezado_Tirilla
@@ -39,6 +40,7 @@ export async function getFormulaDataService(valor: string, bodega: string): Prom
         `);
 
       const numeroFormulaLocal = result.recordset[0]?.NumeroFormula || null;
+
       if (!numeroFormulaLocal) {
         return {
           identificacion,
@@ -47,12 +49,15 @@ export async function getFormulaDataService(valor: string, bodega: string): Prom
           correo,
           direccion,
           numeroFormula,
-          error: "No se encontró el radicado en la base de datos del dispensario"
+          error: "No se encontró el radicado en la base de datos del dispensario",
         };
       }
 
-      // 2. Consumir la API externa para obtener la información de la fórmula
-      const apiResponse: ApiResponse<FormulaData[]> = await getDataRadicado(numeroFormulaLocal, bodega);
+      // Consultar API externa
+      const apiResponse: ApiResponse<FormulaData[]> = await getDataRegistered(
+        numeroFormulaLocal,
+        dispensaryCode
+      );
 
       if (apiResponse.success && apiResponse.data && apiResponse.data.length > 0) {
         const formula = apiResponse.data[0];
@@ -60,7 +65,7 @@ export async function getFormulaDataService(valor: string, bodega: string): Prom
         nombre = formula.llavePaciente || null;
         numeroFormula = formula.formula || null;
 
-        // 3. Si se obtuvo la identificación, buscar datos de contacto y dirección en la tabla local
+        // Consultar info adicional en la BD local
         if (identificacion) {
           const domicilioResult = await pool.request()
             .input("identificacion", identificacion)
@@ -70,9 +75,9 @@ export async function getFormulaDataService(valor: string, bodega: string): Prom
               WHERE identificacion = @identificacion
             `);
 
-          if (domicilioResult.recordset && domicilioResult.recordset.length > 0) {
+          if (domicilioResult.recordset.length > 0) {
             const domicilio = domicilioResult.recordset[0];
-            telefonos = (domicilio.contacto1 || '') + (domicilio.contacto2 ? `, ${domicilio.contacto2}` : '');
+            telefonos = (domicilio.contacto1 || "") + (domicilio.contacto2 ? `, ${domicilio.contacto2}` : "");
             direccion = domicilio.direccion || null;
             correo = domicilio.correo || null;
           }
@@ -85,15 +90,16 @@ export async function getFormulaDataService(valor: string, bodega: string): Prom
           correo,
           direccion,
           numeroFormula,
-          error: apiResponse.error
+          error: apiResponse.error,
         };
       }
     } else {
-      // Caso 2: es tipo y número (información en BD local)
-      const { tipo, numero } = formatTipoNumero(valor);
+      // 🟢 Caso 2: tipo y número
+      const { type, number } = formatTypeNumber(resgisteredTypeNumber);
+
       const result = await pool.request()
-        .input("tipo", tipo)
-        .input("numero", numero)
+        .input("tipo", type)
+        .input("numero", number)
         .query(`
           SELECT 
             E.NumeroFormula,
@@ -105,7 +111,7 @@ export async function getFormulaDataService(valor: string, bodega: string): Prom
           WHERE E.Tipo = @tipo AND E.Numero = @numero
         `);
 
-      if (result.recordset && result.recordset.length > 0) {
+      if (result.recordset.length > 0) {
         const record = result.recordset[0];
         numeroFormula = record.NumeroFormula || null;
         nombre = record.Nombre || null;
@@ -120,15 +126,23 @@ export async function getFormulaDataService(valor: string, bodega: string): Prom
           correo,
           direccion,
           numeroFormula,
-          error: "No se encontró información para este tipo/número de fórmula"
+          error: "No se encontró información para este tipo/número de fórmula",
         };
       }
     }
 
-    // Retornar el objeto unificado
-    return { identificacion, nombre, telefonos, correo, direccion, numeroFormula, error: null };
+    // 🟢 Respuesta unificada
+    return {
+      identificacion,
+      nombre,
+      telefonos,
+      correo,
+      direccion,
+      numeroFormula,
+      error: null,
+    };
   } catch (error) {
-    logger.error("Error en getFormulaDataService:", error);
+    logger.error("❌ Error en getFormulaDataService:", error);
     return {
       identificacion: null,
       nombre: null,
@@ -136,13 +150,9 @@ export async function getFormulaDataService(valor: string, bodega: string): Prom
       correo: null,
       direccion: null,
       numeroFormula: null,
-      error: `Error al procesar la solicitud: ${error instanceof Error ? error.message : "Error desconocido"}`,
+      error: `Error al procesar la solicitud: ${
+        error instanceof Error ? error.message : "Error desconocido"
+      }`,
     };
-  } finally {
-    if (pool) {
-      try { pool.close(); } catch (closeError) {
-        logger.error("Error cerrando la conexión a la base de datos:", closeError);
-      }
-    }
   }
 }

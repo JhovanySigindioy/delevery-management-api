@@ -1,7 +1,7 @@
-export function formatTipoNumero(valor: string): { tipo: string | null; numero: string | null } {
-  if (valor.includes("-")) {
-    const [tipo, numero] = valor.split("-");
-    return { tipo, numero };
+export function formatTypeNumber(typeNumber: string): { type: string | null; number: string | null } {
+  if (typeNumber.includes("-")) {
+    const [type, number] = typeNumber.split("-");
+    return { type, number };
   }
-  return { tipo: null, numero: null };
+  return { type: null, number: null };
 }

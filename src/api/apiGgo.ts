@@ -5,24 +5,26 @@ import { ManagementEntrega } from "../interfaces/managementEntrega";
 import { env } from "../config";
 
 export async function sendDataDeliveryCompany(entrega: ManagementEntrega): Promise<any> {
-    const fechaDomicilio = entrega.fechaDomicilio
-        ? entrega.fechaDomicilio.split("T")[0]
+    const deliveryDate = entrega.deliveryDate
+        ? entrega.deliveryDate.split("T")[0]
         : null;
-    const fechaDomicilioForRoute = entrega.fechaDomicilio
-        ? new Date(entrega.fechaDomicilio).toISOString().split("T")[0]
+
+    const deliveryDateForRoute = entrega.deliveryDate
+        ? new Date(entrega.deliveryDate).toISOString().split("T")[0]
         : null;
+
     const payload: GgoRequest = {
-        orderNumber: entrega.radicadoTipoNumero.trim(),
-        customerName: entrega.nombrePaciente,
-        address: entrega.direccion,
+        orderNumber: entrega.registeredTypeNumber.trim(),
+        customerName: entrega.patientName,
+        address: entrega.address,
         managementType: 1,
-        route: { scheduleDate: fechaDomicilioForRoute || "" },
-        deliveryPlannedDate: fechaDomicilio || undefined,
-        phone: entrega.contacto1 || undefined,
-        cellphone: entrega.contacto2 || undefined,  
-        email: entrega.correo || undefined,
-        comments: entrega.observaciones || undefined,
-        fromHour: entrega.horaDomicilio || undefined,
+        route: { scheduleDate: deliveryDateForRoute || "" },
+        deliveryPlannedDate: deliveryDate || undefined,
+        phone: entrega.primaryPhone || undefined,
+        cellphone: entrega.secondaryPhone || undefined,
+        email: entrega.email || undefined,
+        comments: entrega.notes || undefined,
+        fromHour: entrega.deliveryTime || undefined,
         toHour: undefined,
     };
 
@@ -30,7 +32,7 @@ export async function sendDataDeliveryCompany(entrega: ManagementEntrega): Promi
         const response = await axios.post(env.apiDeliveryCompany.urlShippings, payload);
         return response.data;
     } catch (error: any) {
-        console.error(`❌ Error al enviar la entrega ${entrega.radicadoTipoNumero}:`, error.message);
-        throw new Error(error.message || "Error al enviar entrega a GGo");
+        console.error(`❌ Error sending delivery ${entrega.registeredTypeNumber}:`, error.message);
+        throw new Error(error.message || "Error sending delivery to GGo");
     }
 }
