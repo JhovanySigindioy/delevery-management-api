@@ -2,9 +2,10 @@ import { Router } from "express";
 import { getContractDataController } from "../controller/contract.controller";
 import { contractRequestMiddleware } from "../middleware/contractRequest.middleware";
 import { formulaRequestMiddleware } from "../middleware/formulaRequest.middleware";
-import { createEntregaController } from "../controller/entregas.controller";
+import { createEntregaController, getLastManagementsEntregaController } from "../controller/entregas.controller";
 import { getFormulaDataController } from "../controller/formula.controller";
 import { updatePatientDeliveryInfoController } from "../controller/patient.controller";
+import { get } from "http";
 
 export const router: Router = Router();
 //Obtenemos data de contrato y ubicacion de la farmacia
@@ -18,3 +19,6 @@ router.post("/management-entregas", createEntregaController);
 
 //Actualizar datos del paciente
 router.patch("/patient/:identification", updatePatientDeliveryInfoController);
+
+//Obtener 10 ultimas gestiones de entregas
+router.get("/management-entregas/", getLastManagementsEntregaController);

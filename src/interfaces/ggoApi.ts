@@ -9,8 +9,8 @@ export interface GgoRequest {
         scheduleDate: string;
     };
 
-    phone?: string;       // ✅ opcional
-    cellphone?: string;   // ✅ opcional
+    phone?: string;
+    cellphone?: string;
     email?: string;
     comments?: string;
     fromHour?: string;

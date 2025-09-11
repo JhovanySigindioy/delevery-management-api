@@ -1,5 +1,5 @@
 export * from './errors';
 export * from './logger';
-export * from './parseToTime';
+export * from './formatTypeNumber';
 export * from './parserToJson';
-export * from './tipoNumero';
+

@@ -9,6 +9,8 @@ export interface AuthenticatedRequest extends Request {
 }
 
 export function verifyTokenMiddleware(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+
+    console.log("validamos que el middleware de verificar token este siendo usado ", JSON.stringify(req.jwtPayload, null, 2));
     const authHeader = req.headers["authorization"];
     const secret = env.jwtData.jwt_secret || "";
 
@@ -35,7 +37,7 @@ export function verifyTokenMiddleware(req: AuthenticatedRequest, res: Response, 
     try {
         const decoded = jwt.verify(token, secret);
         logger.info(` Token JWT válido. Payload: ${JSON.stringify(decoded)}`);
-
+        console.log("decoded", decoded);
         // Guardar payload en la request para el controller
         req.jwtPayload = decoded;
 
