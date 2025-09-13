@@ -15,7 +15,7 @@ export function combineToUtc(date: string, time: string): string {
   const local = new Date(`${date}T${time}:00-05:00`); // Colombia
   return local.toISOString();
 }
-// Cumple con el reuisito de la base de datos 
+
 export function toSqlTime(timeStr: string | null): Date | null {
   if (!timeStr) return null;
   const [hours, minutes, seconds] = timeStr.split(":").map(Number);

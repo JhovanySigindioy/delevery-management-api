@@ -1,5 +1,5 @@
 import sql from "mssql";
-import { runTransaction } from "./_baseService";
+import { runTransaction } from "./_base.service";
 import { PatientDeliveryInfo } from "../interfaces/patient";
 import { DatabaseError, logger } from "../utils";
 

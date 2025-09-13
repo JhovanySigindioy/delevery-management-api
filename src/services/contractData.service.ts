@@ -1,5 +1,4 @@
-import sql from "mssql";
-import { runQuery } from "./_baseService";
+import { runQuery } from "./_base.service";
 
 export interface IPharmacyResponse {
   name: string | null;
@@ -42,10 +41,10 @@ export async function getContractDataService(
 
     const pharmacy = pharmacyResult.recordset[0]
       ? {
-          name: pharmacyResult.recordset[0].punto_venta_outlook,
-          city: pharmacyResult.recordset[0].ciudad,
-          pharmacyCode: pharmacyResult.recordset[0].pos,
-        }
+        name: pharmacyResult.recordset[0].punto_venta_outlook,
+        city: pharmacyResult.recordset[0].ciudad,
+        pharmacyCode: pharmacyResult.recordset[0].pos,
+      }
       : null;
 
     return {

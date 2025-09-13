@@ -1,5 +1,5 @@
 import sql from "mssql";
-import { runTransaction } from "./_baseService";
+import { runTransaction } from "./_base.service";
 import { DatabaseError, logger } from "../utils";
 import { ManagementEntregaRequest, ManagementEntregaResponse } from "../interfaces";
 
@@ -62,7 +62,6 @@ export async function saveManagementEntregaService(entrega: ManagementEntregaReq
     }
   });
 }
-
 
 export async function getLastManagementsEntregaService(pharmacistId: string) {
   return runTransaction(async (tx) => {

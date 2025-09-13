@@ -10,7 +10,6 @@ import { AuthenticatedRequest } from "../middleware";
 //Guardamos el reporte de la gestion de una entrega
 export async function createEntregaController(req: AuthenticatedRequest, res: Response) {
     try {
-        console.log("Validamos si llega codigo de la farmacia ", JSON.stringify(req.body.entrega, null, 2));
         const payload = req.jwtPayload as { id: string };
         const pharmacistId = payload?.id;
 
@@ -44,7 +43,6 @@ export async function createEntregaController(req: AuthenticatedRequest, res: Re
                     data: { ...saved, ggoResponse },
                     error: null,
                 };
-                console.log("ENTREGA ENVIADA AL FRONTEND ", JSON.stringify(response, null, 2));
                 return res.status(200).json(response);
             } catch (err: any) {
                 logger.error("❌ Error enviando a empresa de domicilio:", err);
@@ -83,10 +81,10 @@ export async function createEntregaController(req: AuthenticatedRequest, res: Re
     }
 }
 
-// obtenemos las 10 últimas entregas del regente logueado
+
 export const getLastManagementsEntregaController = async (req: AuthenticatedRequest, res: Response) => {
     try {
-        console.log("Validamos si llega codigo de la farmacia ", JSON.stringify(req.jwtPayload, null, 2));
+        
         const payload = req.jwtPayload as { id: string };
         const pharmacistId = payload?.id;
 
@@ -121,5 +119,3 @@ export const getLastManagementsEntregaController = async (req: AuthenticatedRequ
         return res.status(500).json(response);
     }
 };
-
-
