@@ -20,7 +20,16 @@ export interface ManagementEntregaRequest {
     isUrgent?: boolean;
     sentToHome: boolean;
 
-    pharmacyCode: string;
+    pharmacy?: {
+        pharmacyCode: string;
+        name: string;
+        location: {
+            countryCode: string;
+            departmentCode: string;
+            municipalityCode: string;
+            address: string;
+        }
+    };
 }
 
 export interface ManagementEntregaResponse {

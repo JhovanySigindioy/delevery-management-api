@@ -14,6 +14,8 @@ export async function createEntregaController(req: AuthenticatedRequest, res: Re
 
         const { entrega } = req.body;
 
+        console.log("entrega AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA ", entrega);
+
         if (!entrega || !entrega.registeredTypeNumber || !entrega.patientName) {
             return res.status(400).json({
                 success: false,
@@ -21,7 +23,7 @@ export async function createEntregaController(req: AuthenticatedRequest, res: Re
                 error: "El cuerpo de la petición debe contener una entrega válida con 'registeredTypeNumber' y 'patientName'.",
             });
         }
-  
+
         const shouldSendToDomicile = entrega.callResult === "confirmado";
 
         if (shouldSendToDomicile) {

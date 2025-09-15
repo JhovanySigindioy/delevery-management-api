@@ -38,7 +38,7 @@ export async function saveManagementEntregaService(entrega: ManagementEntregaReq
         .input("regente_id", sql.VarChar(50), pharmacistId)
         .input("es_urgente", sql.Bit, entrega.isUrgent ? 1 : 0)
         .input("enviado_a_domicilio", sql.Bit, entrega.sentToHome ? 1 : 0)
-        .input("dispensario_id", sql.VarChar(20), entrega.pharmacyCode)
+        .input("dispensario_id", sql.VarChar(20), entrega.pharmacy?.pharmacyCode)
         .query(`
           INSERT INTO GestionesEntregasPendientes
             (radicado_tipo_numero, paciente_id, fecha_gestion, hora_gestion, fecha_domicilio, hora_domicilio,

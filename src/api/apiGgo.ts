@@ -16,7 +16,7 @@ function formatDateColombia(dateStr: string): string {
 // helper para formatear fecha+hora en Colombia a ISO UTC
 function formatDateTimeUTC(dateStr: string): string {
     const d = new Date(dateStr);
-    return d.toISOString(); // GGo espera UTC
+    return d.toISOString(); // GGO espera UTC
 }
 
 // helper para formatear solo hora local a HH:mm:ss
@@ -46,17 +46,31 @@ export async function sendDataDeliveryCompany(
         orderNumber: entrega.registeredTypeNumber.trim(),
         customerName: entrega.patientName,
         address: entrega.address,
-        managementType: 1, // 1 = Entrega
-        route: { scheduleDate: deliveryDateForRoute || "" },
-        deliveryPlannedDate: entrega.deliveryDate
-            ? formatDateTimeUTC(entrega.deliveryDate)
-            : undefined,
+        addressAdd: "",
+        managementType: 1,
         phone: entrega.primaryPhone || undefined,
         cellphone: entrega.secondaryPhone || undefined,
         email: entrega.email || undefined,
         comments: entrega.notes || undefined,
         fromHour: entrega.deliveryTime ? formatTimeColombia(entrega.deliveryTime) : undefined,
         toHour: entrega.deliveryTime ? formatTimeColombia(entrega.deliveryTime) : undefined,
+        deliveryPlannedDate: entrega.deliveryDate
+            ? formatDateTimeUTC(entrega.deliveryDate)
+            : undefined,
+        route: {
+            scheduleDate: deliveryDateForRoute || "",
+            priority: entrega.isUrgent ? 1 : 3, // 🔹 Urgente = prioridad más alta
+        },
+        dispensary: {
+            code: entrega.pharmacy?.pharmacyCode || "",
+            name: entrega.pharmacy?.name || "",
+            location: {
+                countryCode: entrega.pharmacy?.location.countryCode || "",
+                departmentCode: entrega.pharmacy?.location.departmentCode || "",
+                cityCode: entrega.pharmacy?.location.municipalityCode || "",
+                address: entrega.pharmacy?.location.address || "",
+            }
+        }
     };
 
     try {
