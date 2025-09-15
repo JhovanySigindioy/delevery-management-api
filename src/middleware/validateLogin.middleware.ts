@@ -12,7 +12,6 @@ export const validateLogin = [
         .isLength({ min: 6 }).withMessage("La contraseña debe tener al menos 6 caracteres."),
 
     (req: Request, res: Response, next: NextFunction) => {
-        console.log("USUARIO Y CONTRASEÑA RECIBIDA:::", req.body);
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({

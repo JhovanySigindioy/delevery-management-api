@@ -6,7 +6,6 @@ import { ApiResponse } from "../interfaces/apiResponse";
 import { DatabaseError, logger } from "../utils";
 import { AuthenticatedRequest } from "../middleware";
 
-
 //Guardamos el reporte de la gestion de una entrega
 export async function createEntregaController(req: AuthenticatedRequest, res: Response) {
     try {
@@ -22,7 +21,7 @@ export async function createEntregaController(req: AuthenticatedRequest, res: Re
                 error: "El cuerpo de la petición debe contener una entrega válida con 'registeredTypeNumber' y 'patientName'.",
             });
         }
-
+  
         const shouldSendToDomicile = entrega.callResult === "confirmado";
 
         if (shouldSendToDomicile) {
@@ -84,7 +83,7 @@ export async function createEntregaController(req: AuthenticatedRequest, res: Re
 
 export const getLastManagementsEntregaController = async (req: AuthenticatedRequest, res: Response) => {
     try {
-        
+
         const payload = req.jwtPayload as { id: string };
         const pharmacistId = payload?.id;
 

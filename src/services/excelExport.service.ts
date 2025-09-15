@@ -8,23 +8,23 @@ export async function generateEntregasExcel(data: ManagementEntregaResponse[]) {
 
   worksheet.columns = [
     { header: "ID Gestión", key: "managementId", width: 15 },
-    { header: "Paciente", key: "patientName", width: 30 },
-    { header: "Identificación", key: "identification", width: 20 },
+    { header: "Municipio", key: "municipalityName", width: 20 },
+    { header: "Departamento", key: "departmentName", width: 20 },
+    { header: "Urgente", key: "isUrgent", width: 10 },
+    { header: "Paciente (Recibe)", key: "patientName", width: 30 },
     { header: "Teléfono 1", key: "primaryPhone", width: 15 },
     { header: "Teléfono 2", key: "secondaryPhone", width: 15 },
     { header: "Correo", key: "email", width: 25 },
     { header: "Dirección", key: "address", width: 40 },
-    { header: "Fecha Gestión", key: "managementDate", width: 15 },
-    { header: "Hora Gestión", key: "managementTime", width: 12 },
+
     { header: "Fecha Entrega", key: "deliveryDate", width: 15 },
     { header: "Hora Entrega", key: "deliveryTime", width: 12 },
     { header: "Tipo Empaque", key: "packageType", width: 15 },
-    { header: "Resultado Llamada", key: "callResult", width: 20 },
     { header: "Notas", key: "notes", width: 40 },
-    { header: "Urgente", key: "isUrgent", width: 10 },
-    { header: "Domicilio", key: "sentToHome", width: 10 },
+
   ];
 
+  // Agregar filas
   data.forEach((row) => {
     worksheet.addRow({
       ...row,
@@ -33,7 +33,39 @@ export async function generateEntregasExcel(data: ManagementEntregaResponse[]) {
     });
   });
 
-  worksheet.getRow(1).font = { bold: true };
+  // 🔹 Estilos encabezados
+  const headerRow = worksheet.getRow(1);
+  headerRow.font = { bold: true, color: { argb: "FFFFFFFF" } };
+  headerRow.alignment = { vertical: "middle", horizontal: "center" };
+  headerRow.height = 20;
+
+  headerRow.eachCell((cell) => {
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "4472C4" }, // azul
+    };
+    cell.border = {
+      top: { style: "thin" },
+      left: { style: "thin" },
+      bottom: { style: "thin" },
+      right: { style: "thin" },
+    };
+  });
+
+  // Colores intercalados a las filas de datos
+  worksheet.eachRow((row, rowNumber) => {
+    if (rowNumber === 1) return; // saltar encabezado
+
+    const fillColor = rowNumber % 2 === 0 ? "F2F2F2" : "FFFFFF"; // gris claro y blanco
+    row.eachCell((cell) => {
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: fillColor },
+      };
+    });
+  });
 
   return workbook.xlsx.writeBuffer();
 }

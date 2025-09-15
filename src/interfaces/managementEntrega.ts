@@ -24,7 +24,7 @@ export interface ManagementEntregaRequest {
 }
 
 export interface ManagementEntregaResponse {
-    registeredTypeNumber: string;
+    registeredTypeNumber?: string;
     patientName: string;
     identification: string;
     primaryPhone: string;
@@ -42,6 +42,8 @@ export interface ManagementEntregaResponse {
     isUrgent: boolean;
     sentToHome: boolean;
     managementId: number;
+    municipalityName?: string;
+    departmentName?: string;
 }
 
 

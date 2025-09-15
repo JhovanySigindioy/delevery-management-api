@@ -4,6 +4,9 @@ export interface IPharmacyResponse {
   name: string | null;
   city: string | null;
   pharmacyCode: string | null;
+  address: string | null;
+  departmentCode: string | null;
+  municipalityCode: string | null;
 }
 
 export interface IContractResponse {
@@ -17,6 +20,7 @@ export async function getContractDataService(
   userId: string
 ): Promise<IContractResponse> {
   return runQuery(async (pool) => {
+    // 1. Buscar el contrato en InfoClientes
     const contractResult = await pool
       .request()
       .input("nit", nit)
@@ -26,31 +30,60 @@ export async function getContractDataService(
 
     const contract = contractResult.recordset[0]?.Nombre || null;
     if (!contract) {
-      return { contract: null, pharmacy: null, error: "No se encontró contrato con ese NIT" };
+      return {
+        contract: null,
+        pharmacy: null,
+        error: "No se encontró contrato con ese NIT",
+      };
     }
 
+    // 2. Buscar farmacia y ciudad/departamento
     const pharmacyResult = await pool
       .request()
       .input("userId", userId)
-      .query<{ pos: string; punto_venta_outlook: string; ciudad: string }>(`
-        SELECT f.pos, f.punto_venta_outlook, f.ciudad
-        FROM UsuariosPermisos u
-        INNER JOIN dw__dim_pos f ON f.pos = u.Menu
-        WHERE IdUsuario = @userId AND programa = 4548
-      `);
+      .query<{
+        pos: string;
+        punto_venta_outlook: string;
+        ciudad: string;
+        direccion_drogueria: string;
+        IdCiudad: string;
+        IdDepartamento: string;
+      }>(`
+    SELECT 
+      f.pos,
+      f.punto_venta_outlook,
+      f.ciudad,
+      f.direccion_drogueria,
+      c.IdCiudad,
+      c.IdDepartamento
+    FROM UsuariosPermisos u
+    INNER JOIN dw__dim_pos f ON f.pos = u.Menu
+    INNER JOIN Clientes cli ON cli.IdClientes = f.pos
+    INNER JOIN Ciudad c ON c.IdCiudad = cli.IdCiudad
+    WHERE u.IdUsuario = @userId 
+      AND u.programa = 4548
+  `);
 
-    const pharmacy = pharmacyResult.recordset[0]
+
+    const row = pharmacyResult.recordset[0];
+
+    const pharmacy = row
       ? {
-        name: pharmacyResult.recordset[0].punto_venta_outlook,
-        city: pharmacyResult.recordset[0].ciudad,
-        pharmacyCode: pharmacyResult.recordset[0].pos,
+        name: row.punto_venta_outlook,
+        city: row.ciudad,
+        address: row.direccion_drogueria,
+        pharmacyCode: row.pos,
+        departmentCode: row.IdDepartamento,
+        municipalityCode: row.IdCiudad,
       }
       : null;
 
     return {
       contract,
       pharmacy,
-      error: pharmacy ? null : "No se encontraron datos de farmacia para ese usuario",
+      error: pharmacy
+        ? null
+        : "No se encontraron datos de farmacia para ese usuario",
     };
   }) as Promise<IContractResponse>;
 }
